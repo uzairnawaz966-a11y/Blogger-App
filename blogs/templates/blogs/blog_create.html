@@ -1,0 +1,20 @@
+{% extends "blogs/base.html" %}
+
+{% block title %}
+    create
+{% endblock title %}
+
+{% block body %}
+
+<h2 align="center">Add a blog Post</h2>
+
+<form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Create Blog</button>
+<a href="{% url 'home' %}"  style="text-decoration: None;color: red;"><b>Discard</b></a>
+
+</form>
+
+
+{% endblock body %}

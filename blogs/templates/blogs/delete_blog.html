@@ -1,0 +1,20 @@
+{% extends "blogs/base.html" %}
+
+
+{% block title %}
+    delete
+{% endblock title %}
+
+
+
+
+{% block body %}
+
+<h2>Are you sure? </h2>
+<p>You want to delete this blog?</p>
+<form method="POST">
+    {% csrf_token %}
+    <button type="submit">Delete</button>
+</form>
+
+{% endblock body %}

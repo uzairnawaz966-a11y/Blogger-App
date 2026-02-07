@@ -1,0 +1,19 @@
+{% extends "blogs/base.html" %}
+
+{% block title %}
+    signup
+{% endblock title %}
+
+{% block body %}
+
+<h2>User Registration</h2>
+
+<form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Register</button>
+    <a href="{% url 'login' %}" style="text-decoration: None; color: Green;"><b>Already have an account!</b></a>
+
+</form>
+
+{% endblock body %}

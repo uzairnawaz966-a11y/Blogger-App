@@ -1,0 +1,29 @@
+{% extends "blogs/base.html" %}
+
+{% block title %}
+    followers
+{% endblock title %}
+
+{% block body %}
+<h2 align="center">My Followers</h2>
+
+<p>Click a user to view blogs</p><br>
+
+{% if followers %}
+    {% for follower in followers %}
+    <ul>
+        <li style="color: red;">
+            <b><a href="" style="text-decoration: None; color: darkblue;">{{ follower.follower }}</a></b> ( Interested in {{ follower.following.interest.category }} category )<br><br>
+        </li>
+    </ul>
+    {% endfor %}
+{% else %}
+    You have no Followers!
+{% endif %}
+
+<h3 align="center">
+    <a href="{% url 'home' %}" style="text-decoration: None;color: grey;"><b>Go Back</b></a>
+</h3>
+<hr>
+
+{% endblock body %}

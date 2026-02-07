@@ -1,0 +1,39 @@
+{% extends "blogs/base.html" %}
+
+
+{% block title %}
+    recommended
+{% endblock title %}
+
+
+
+
+{% block body %}
+
+<h2>Blogs</h2>
+
+
+{% if recommendations %}
+<ul>
+{% for recommended in recommendations %}
+    <li>
+    <p><b style="color: crimson">You and {{recommended.user.username}} are Interest in {{ recommended.user.interest.category }} Category</b></p>
+    <p><b>User: </b>{{ recommended.user }}</p>
+    <p><b>Title: </b>{{ recommended.title }}</p>
+    <p><b>Description: </b>{{ recommended.description }}</p>
+    <p><b>Category: </b>{{ recommended.category }}</p>
+    <a href="{% url 'blog_detail' recommended.slug %}" style="text-decoration: None; color: blue;"><b>Details</b></a>
+    <br>
+    <br>
+    </li>
+{% endfor %}
+</ul>
+{% else %}
+    No Blogs Found
+{% endif %}
+
+<h3 align="center">
+    <a href="{% url 'home' %}" style="text-decoration: None;color: grey;"><b>Go Back</b></a>
+</h3>
+<hr>
+{% endblock body %}

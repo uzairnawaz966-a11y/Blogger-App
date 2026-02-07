@@ -1,0 +1,31 @@
+{% extends "blogs/base.html" %}
+
+{% block title %}
+    home
+{% endblock title %}
+
+{% block body %}
+<h2>Welcome {{request.user}}</h2>
+
+<ul>
+    <li>
+        <a href="{% url 'create' %}" style="text-decoration: None; color: blue;"><b>Add a Blog</b></a><br><br>
+    </li>
+    <li>
+        <a href="{% url 'blog_list' %}" style="text-decoration: None; color: blue;"><b>My Blogs</b></a><br><br>
+    </li>
+    <li>
+        <a href="{% url 'favourites' %}" style="text-decoration: None; color: Green;"><b>My Favourite Blogs</b></a><br><br>
+    </li>
+    <li>
+        <a href="{% url 'recomended' %}" style="text-decoration: None; color: darkslateblue;"><b>See how others are interested in {{request.user.interest.category}} category</b></a><br><br>
+    </li>
+    <li>
+        <a href="{% url 'follower' %}" style="text-decoration: None; color: red;"><b>Followers</b></a><br><br>
+    </li>
+    <li>
+        <a href="{% url 'following' %}" style="text-decoration: None; color: orangered;"><b>Followings</b></a><br><br>
+    </li>
+</ul>
+
+{% endblock body %}

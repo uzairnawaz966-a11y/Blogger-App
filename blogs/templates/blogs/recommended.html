@@ -6,25 +6,28 @@
 
 
 {% block body %}
-<h2>Blogs</h2>
-
 {% if recommendations %}
-<ul>
-{% for recommended in recommendations %}
-    <li>
-        <p><b style="color: crimson">You and {{recommended.user.username}} are Interest in {{ recommended.user.interest.category }} Category</b></p>
-        <p><b>User: </b>{{ recommended.user }}</p>
-        <p><b>Title: </b>{{ recommended.title }}</p>
-        <p><b>Description: </b>{{ recommended.description }}</p>
-        <p><b>Category: </b>{{ recommended.category }}</p>
-        <a href="{% url 'blog_detail' recommended.slug %}" style="text-decoration: None; color: blue;"><b>Details</b></a>
-        <br>
-        <br>
-    </li>
-{% endfor %}
-</ul>
+
+<h2 align="center">{{ request.user.interest.category }} Category</h2>
+
+    {% for recommended in recommendations %}
+        {% if recommended.user != request.user %}
+            <ul>
+                <li style="border: 2px solid darkblue; border-radius: 25px; padding: 15px;">
+                    <p><b>User: </b>{{ recommended.user }}</p>
+                    <p><b>Title: </b>{{ recommended.title }}</p>
+                    <p><b>Description: </b>{{ recommended.description }}</p>
+                    <p><b>Category: </b>{{ recommended.category }}</p>
+                    <p><b style="color:darkblue">{{ recommended.user.username }} is interested in {{ recommended.user.interest.category }}</b></p>
+                    <br>
+                    <br>
+                </li>
+            </ul>
+        {% endif %}
+    {% endfor %}
+
 {% else %}
-    No Blogs Found
+    <p style="color: gray;">No Blogs Found!</p>
 {% endif %}
 
 <h3 align="center">

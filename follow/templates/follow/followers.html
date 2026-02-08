@@ -7,18 +7,18 @@
 {% block body %}
 <h2 align="center">My Followers</h2>
 
+{% if followers %}
 <p>Click a user to view blogs</p><br>
 
-{% if followers %}
     {% for follower in followers %}
     <ul>
         <li style="color: red;">
-            <b><a href="" style="text-decoration: None; color: darkblue;">{{ follower.follower }}</a></b> ( Interested in {{ follower.following.interest.category }} category )<br><br>
+            <b><a href="{% url 'follower_blogs' follower.follower %}" style="text-decoration: None; color: darkblue;">{{ follower.follower }}</a></b> ( Interested in {{ follower.following.interest.category }} category )<br><br>
         </li>
     </ul>
     {% endfor %}
 {% else %}
-    You have no Followers!
+    <p style="color: gray;">You have no Followers Yet!</p>
 {% endif %}
 
 <h3 align="center">

@@ -1,32 +1,28 @@
 {% extends "blogs/base.html" %}
 
-
 {% block title %}
-    Blogs
+    {{ user }} blogs
 {% endblock title %}
-
-
-
 
 {% block body %}
 
-<h2 align="center">{{request.user}}'s all Blogs</h2>
+<h2 align="center">{{ user|upper }}</h2>
 
-{% if blogs %}
-    {% for blog in blogs %}
+
+{% if follower_blogs %}
+    {% for blog in follower_blogs %}
     <ul>
-        <li>
+        <li style="border: 2px solid darkblue; border-radius: 25px; padding: 15px;">
             <p><b>Title: </b>{{ blog.title }}</p>
             <p><b>Description: </b>{{ blog.description }}</p>
             <p><b>Category: </b>{{ blog.category }}</p>
-            <a href="{% url 'blog_detail' blog.slug %}" style="text-decoration: None; color: blue;"><b>Details</b></a>
-            <br>
+            <p><b>Published at: </b>{{ blog.published_at }}</p>
             <br>
         </li>
     </ul>
     {% endfor %}
 {% else %}
-    <p style="color: gray;">No Blogs Found!</p>
+    <p style="color: gray;">No Blogs Found</p>
 {% endif %}
 
 <h3 align="center">

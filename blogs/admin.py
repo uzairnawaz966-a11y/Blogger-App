@@ -3,7 +3,6 @@ from blogs.models import (
     Blog,
     Category,
     Interest,
-    Follow,
 )
 
 
@@ -48,13 +47,7 @@ class BlogAdmin(admin.ModelAdmin):
     }
 
 
-@admin.register(Follow)
-class FollowAdmin(admin.ModelAdmin):
-    list_display = [
-        "id",
-        "follower",
-        "following"
-    ]
+
 
 
 

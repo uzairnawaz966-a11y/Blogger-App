@@ -2,32 +2,41 @@
 
 
 {% block title %}
-    Blogs
+    Feed
 {% endblock title %}
+
+
+
 
 {% block body %}
 
-<h2 align="center">My Blogs</h2>
+<h2 align="center">Blogs</h2>
 
-{% if blogs %}
-    {% for blog in blogs %}
+{% if feed_blogs %}
+    {% for feed in feed_blogs %}
     <ul>
         <li style="border: 2px solid grey; padding: 20px; border-radius: 15px; text-align: justify;">
-            <p><b>Title: </b>{{ blog.title }}</p>
-            <p><b>Description: </b>{{ blog.description }}</p>
-            <p><b>Category: </b>{{ blog.category }}</p>
-            <a href="{% url 'blog_detail' blog.slug %}" style="text-decoration: None; color: blue;"><b>Details</b></a>
-            <a href="{% url 'delete' blog.slug %}" style="text-decoration: None; color: red;"><b>Delete</b></a>
-            <a href="{% url 'update' blog.slug %}" style="text-decoration: None; color: Green;"><b>Modify this Blog</b></a>
+
+            {% if follow_variable == 1%}
+                        <a href="{% url 'follow_button' feed.user.username %}" style="text-decoration: none;color: crimson;"><b>Follow {{ feed.user.username }}</b></a>
+            {% else %}
+                        <a href="{% url 'follow_button' feed.user.username %}" style="text-decoration: none;color: crimson;"><b>UnFollow {{ feed.user.username }}</b></a>
+            {% endif %}
+            <p><b>User: </b>{{ feed.user.username }}</p>
+            <p><b>Title: </b>{{ feed.title }}</p>
+            <p><b>Description: </b>{{ feed.description }}</p>
+            <p><b>Category: </b>{{ feed.category }}</p>
+            <p><b>{{ feed.user }} is Interested in </b>{% for interest in feed.user.user_interests.all %}{{ interest }}{% if not forloop.last %}, {% endif %}{% endfor %}</p></br>
+            <p><b>Published at: </b>{{ feed.published_at }}</p>
             <br>
             <br>
         </li>
     </ul>
     {% endfor %}
-{% else %}
-    No Blogs Found
-{% endif %}
 
+{% else %}
+    <p style="color: gray;">No Blogs Found!</p>
+{% endif %}
 
 {% if page_obj.has_next and page_obj.has_previous %}
 <div style="display: flex; justify-content: space-between;">
@@ -42,7 +51,6 @@
 <div style="display: flex; justify-content: left;">
     <a href="?page={{ page_obj.previous_page_number }}" style="text-decoration: None;"><b>Previous Page</b></a>
 </div>
-
 {% endif %}
 
 {% if page_obj.paginator.num_pages != 1 %}

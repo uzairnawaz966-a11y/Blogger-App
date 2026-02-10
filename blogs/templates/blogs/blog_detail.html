@@ -6,15 +6,19 @@
 
 {% block body %}
 
-<h1>{{ blog_details.title }}</h1>
+<h1 align="center">{{ blog_details.title }}</h1>
 
-<p><b>Title: </b>{{ blog_details.title }}</p>
+<p><b>Blog Title: </b>{{ blog_details.title }}</p>
 <p><b>Description: </b>{{ blog_details.description }}</p>
 <p><b>Owner: </b>{{ blog_details.user }}</p>
 <p><b>Category: </b>{{ blog_details.category }}</p>
+<p><b>Published date: </b>{{ blog_details.published_at }}</p>
 
-<a href="{% url 'update' blog_details.slug %}" style="text-decoration: None; color: Green;"><b>Modify Blog</b></a>
-<a href="{% url 'delete' blog_details.slug %}" style="text-decoration: None; color: red;"><b>Delete</b></a>
 <a href="{% url 'home' %}" style="text-decoration: None; color: blue;"><b>Home</b></a>
+
+<h3 align="center">
+    <a href="{% url 'blog_list' %}" style="text-decoration: None;color: grey;"><b>Go Back</b></a>
+</h3>
+<hr>
 
 {% endblock body %}

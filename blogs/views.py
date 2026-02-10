@@ -1,11 +1,11 @@
-from django.shortcuts import render
-from blogs.models import Blog, Interest, Follow
-from django.contrib.auth.models import User
-from django.contrib.auth.views import LoginView
+from django.shortcuts import render, redirect
+from follow.models import Follow
+from blogs.models import Blog
+from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from blogs.forms import BlogForm, SignupForm
-from django.urls import reverse_lazy
+from blogs.forms import BlogForm
+from django.urls import reverse_lazy, reverse
 from django.views.generic import (
     CreateView,
     UpdateView,
@@ -16,7 +16,12 @@ from django.views.generic import (
 
 @login_required
 def Home(request):
-    return render(request, "blogs/home.html")
+    user = request.user
+    blog_count = Blog.objects.filter(user=user).count()
+    follower_count = Follow.objects.filter(following=user).count()
+    following_count = Follow.objects.filter(follower=user).count()
+    context = {"blog_count": blog_count, "follower_count": follower_count, "following_count": following_count}
+    return render(request, "blogs/home.html", context)
 
 
 class CreateBlog(LoginRequiredMixin, CreateView):
@@ -38,7 +43,7 @@ class UpdateBlog(LoginRequiredMixin, UpdateView):
     def form_valid(self, form):
         form.instance.user = self.request.user
         return super().form_valid(form)
-    
+
 
 class DeleteBlog(LoginRequiredMixin, DeleteView):
     model = Blog
@@ -47,6 +52,7 @@ class DeleteBlog(LoginRequiredMixin, DeleteView):
 
 
 class BlogList(LoginRequiredMixin, ListView):
+    paginate_by = 5
     model = Blog
     context_object_name = "blogs"
 
@@ -61,6 +67,7 @@ class BlogDetail(LoginRequiredMixin, DetailView):
 
 
 class favourites(LoginRequiredMixin, ListView):
+    paginate_by = 5
     model = Blog
     template_name = "blogs/favourites.html"
     context_object_name = "favourites"
@@ -68,54 +75,38 @@ class favourites(LoginRequiredMixin, ListView):
     def get_queryset(self):
         user = self.request.user
         return Blog.objects.filter(user=user, favourite=True)
-    
-
-class SignUpView(CreateView):
-    model = User
-    form_class = SignupForm
-    template_name = "blogs/signup.html"
-    success_url = reverse_lazy("login")
-
-    def form_valid(self, form):
-        user = form.save(commit=False)
-        user.set_password(form.cleaned_data['password'])
-        user.save()
-
-        Interest.objects.create(user=user, category=form.cleaned_data["category"])
-
-        return super().form_valid(form)
-    
-
-class UserLoginView(LoginView):
-    template_name = "blogs/login.html"
-    redirect_authenticated_user = True
 
 
-class RecommendationView(LoginRequiredMixin, ListView):
-    template_name = "blogs/recommended.html"
-    context_object_name = "recommendations"
+class FeedView(ListView):
+    paginate_by = 5
+    model = Blog
+    template_name = "blogs/feed.html"
+    context_object_name = "feed_blogs"
 
     def get_queryset(self):
+
         user = self.request.user
-        fav = user.interest.category
-        return Blog.objects.filter(category=fav)
+        user_interests = user.user_interests.only("category")
+        user_followings = user.followers.only("following")
+
+        following_list = []
+        for following in user_followings:
+            following_list.append(following)
+
+        blog_list = []
+        for interest in user_interests:
+            blog_list.append(interest.category)
+
+        return Blog.objects.filter(
+            Q(category__in=blog_list) | Q(user__followings__in=following_list)
+        ).order_by("-published_at").distinct()
 
 
-class FollowerView(ListView):
-    model = Follow
-    template_name = "blogs/followers.html"
-    context_object_name = "followers"
-
-    def get_queryset(self):
-        user = self.request.user
-        return Follow.objects.filter(following=user).only("follower")
-
-
-class FollowingView(ListView):
-    model = Follow
-    template_name = "blogs/followings.html"
-    context_object_name = "followings"
-
-    def get_queryset(self):
-        user = self.request.user
-        return Follow.objects.filter(follower=user).only("following")
+@login_required
+def unfavourite_action(request, title):
+    user = request.user
+    favourite = Blog.objects.get(user=user, title=title)
+    updated_favourite = favourite.favourite = False
+    favourite.save()
+    print(updated_favourite)
+    return redirect(reverse('favourites'))

@@ -12,19 +12,19 @@
         <a href="{% url 'create' %}" style="text-decoration: None; color: blue;"><b>Add a Blog</b></a><br><br>
     </li>
     <li>
-        <a href="{% url 'blog_list' %}" style="text-decoration: None; color: blue;"><b>My Blogs</b></a><br><br>
+        <a href="{% url 'blog_list' %}" style="text-decoration: None; color: blue;"><b>My Blogs {% if blog_count != 0  %}({{ blog_count }}){% endif %}</b></a><br><br>
     </li>
     <li>
         <a href="{% url 'favourites' %}" style="text-decoration: None; color: Green;"><b>My Favourite Blogs</b></a><br><br>
     </li>
     <li>
-        <a href="{% url 'recomended' %}" style="text-decoration: None; color: darkslateblue;"><b>See how others are interested in {{request.user.interest.category}} category</b></a><br><br>
+        <a href="{% url 'follower' %}" style="text-decoration: None; color: red;"><b>Followers {% if follower_count != 0  %}({{ follower_count }}){% endif %}</b></a><br><br>
     </li>
     <li>
-        <a href="{% url 'follower' %}" style="text-decoration: None; color: red;"><b>Followers</b></a><br><br>
+        <a href="{% url 'following' %}" style="text-decoration: None; color: orangered;"><b>Followings {% if following_count != 0  %}({{ following_count }}){% endif %}</b></a><br><br>
     </li>
     <li>
-        <a href="{% url 'following' %}" style="text-decoration: None; color: orangered;"><b>Followings</b></a><br><br>
+        <a href="{% url 'feed_list' %}" style="text-decoration: None; color: crimson;"><b>Feed</b></a><br><br>
     </li>
 </ul>
 

@@ -18,7 +18,10 @@ class SignUpView(CreateView):
         user.set_password(form.cleaned_data['password'])
         user.save()
 
-        Interest.objects.create(user=user, category=form.cleaned_data["category"])
+        request_user = User.objects.get(username=form.cleaned_data["username"])
+        categories = form.cleaned_data["category"]
+        for category in categories:
+            Interest.objects.create(user=request_user, category=category)
 
         return super().form_valid(form)
     

@@ -10,17 +10,40 @@
 {% if favourites %}
 {% for favourite in favourites %}
 <ul>
-    <p><b>User: </b>{{ favourite.user }}</p>
-    <p><b>Title: </b>{{ favourite.title }}</p>
-    <p><b>Description: </b>{{ favourite.description }}</p>
-    <p><b>Category: </b>{{ favourite.category }}</p>
-    <a href="{% url 'blog_detail' favourite.slug %}" style="text-decoration: None; color: blue;"><b>Details</b></a>
-    <br>
-    <br>
+    <li style="border: 2px solid grey; padding: 20px; border-radius: 15px; text-align: justify;">
+        <p><b>Title: </b>{{ favourite.title }}</p>
+        <p><b>Description: </b>{{ favourite.description }}</p>
+        <p><b>Category: </b>{{ favourite.category }}</p>
+        <a href="{% url 'blog_detail' favourite.slug %}" style="text-decoration: None; color: blue;"><b>Details</b></a>
+        <a href="{% url 'unfavourite_action' favourite.title %}" style="text-decoration: None; color: red;"><b>Remove from Favourites</b></a>
+        <br>
+        <br>
+    </li>
 </ul>
 {% endfor %}
 {% else %}
     <p style="color: gray;">You haven't any Favourite Blogs</p>
+{% endif %}
+
+
+{% if page_obj.has_next and page_obj.has_previous %}
+<div style="display: flex; justify-content: space-between;">
+<a href="?page={{ page_obj.previous_page_number }}" style="text-decoration: None;"><b>Previous Page</b></a>
+<a href="?page={{ page_obj.next_page_number }}" style="text-decoration: None;"><b>Next Page</b></a>
+</div>
+
+{% elif page_obj.has_next %}
+<div style="display: flex; justify-content: right;">
+    <a href="?page={{ page_obj.next_page_number }}" style="text-decoration: None;"><b>Next Page</b></a>
+</div>
+{% elif page_obj.has_previous %}
+<div style="display: flex; justify-content: left;">
+    <a href="?page={{ page_obj.previous_page_number }}" style="text-decoration: None;"><b>Previous Page</b></a>
+</div>
+{% endif %}
+
+{% if page_obj.paginator.num_pages != 1 %}
+    <p align="center" style="color:grey">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</p>
 {% endif %}
 
 <h3 align="center">

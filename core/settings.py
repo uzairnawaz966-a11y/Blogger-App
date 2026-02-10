@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'blogs',
+    'follow',
+    'userauth',
 ]
 
 MIDDLEWARE = [
@@ -122,8 +124,8 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-LOGIN_URL = "/blog/login/"
+LOGIN_URL = "/userauth/login/"
 
 LOGIN_REDIRECT_URL = "/blog/home/"
 
-LOGOUT_REDIRECT_URL = "/blog/login/"
+LOGOUT_REDIRECT_URL = "/userauth/login/"

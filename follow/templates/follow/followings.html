@@ -1,0 +1,29 @@
+{% extends "blogs/base.html" %}
+
+{% block title %}
+    following
+{% endblock title %}
+
+{% block body %}
+<h2 align="center">Followings</h2>
+
+{% if followings %}
+<p>Click a user to view blogs</p><br>
+
+    {% for user in followings %}
+        <ul>
+            <li style="color: red;">
+                <b><a href="{% url 'following_blogs' user.following %}" style="text-decoration: None; color: darkblue;">{{ user.following }}</a></b> ( Interested in {{ user.following.interest.category }} category )<br><br>
+            </li>
+        </ul>
+    {% endfor %}
+{% else %}
+    <p style="color: gray;">You haven't Followed anyone</p>
+{% endif %}
+    
+<h3 align="center">
+    <a href="{% url 'home' %}" style="text-decoration: None;color: grey;"><b>Go Back</b></a>
+</h3>
+<hr>
+
+{% endblock body %}

@@ -17,11 +17,15 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.contrib.auth.views import LogoutView
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('blog/', include("blogs.urls")),
     path('user/', include("follow.urls")),
-    path('userauth/', include("userauth.urls")),
-    path('blog/logout/', LogoutView.as_view(next_page="/userauth/login/"), name="logout"),
-]
+    path('accounts/', include("userauth.urls")),
+    path('product/', include("products.urls")),
+    path('accounts/', include("allauth.urls")),
+    path('blog/logout/', LogoutView.as_view(), name="logout"),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -9,23 +9,40 @@
 
 <ul>
     <li>
+        <a href="{% url 'addproductview' %}" style="text-decoration: None; color: darkblue;"><b>Add Product</b></a><br><br>
+    </li>
+    <li>
         <a href="{% url 'create' %}" style="text-decoration: None; color: blue;"><b>Add a Blog</b></a><br><br>
     </li>
     <li>
-        <a href="{% url 'blog_list' %}" style="text-decoration: None; color: blue;"><b>My Blogs {% if blog_count != 0  %}({{ blog_count }}){% endif %}</b></a><br><br>
+        <a href="{% url 'blog_list' %}" style="text-decoration: None; color: darkcyan;"><b>My Blogs {% if blog_count != 0  %}({{ blog_count }}){% endif %}</b></a><br><br>
     </li>
     <li>
         <a href="{% url 'favourites' %}" style="text-decoration: None; color: Green;"><b>My Favourite Blogs</b></a><br><br>
     </li>
     <li>
-        <a href="{% url 'follower' %}" style="text-decoration: None; color: red;"><b>Followers {% if follower_count != 0  %}({{ follower_count }}){% endif %}</b></a><br><br>
+        <a href="{% url 'follower' %}" style="text-decoration: None; color: orange;"><b>Followers {% if follower_count != 0  %}({{ follower_count }}){% endif %}</b></a><br><br>
     </li>
     <li>
         <a href="{% url 'following' %}" style="text-decoration: None; color: orangered;"><b>Followings {% if following_count != 0  %}({{ following_count }}){% endif %}</b></a><br><br>
     </li>
     <li>
-        <a href="{% url 'feed_list' %}" style="text-decoration: None; color: crimson;"><b>Feed</b></a><br><br>
+        <a href="{% url 'feed_list' %}" style="text-decoration: None; color: red;"><b>Feed</b></a><br><br>
+    </li>
+    <li>
+        <a href="{% url 'MyProductsView' %}" style="text-decoration: None; color: crimson;"><b>My Products</b></a><br><br>
+    </li>
+    <li>
+        <a href="{% url 'TimelineView' %}" style="text-decoration: None; color: brown;"><b>Timeline</b></a><br><br>
+    </li>
+    <li>
+        <a href="{% url 'CartView' %}" style="text-decoration: None; color: maroon;"><b>Cart {% if cart_items_count != 0  %}({{ cart_items_count }}){% endif %}</b></a><br><br>
+    </li>
+    <li>
+        <a href="{% url 'MyOrders' %}" style="text-decoration: None; color: #530101;"><b>MyOrders</b></a><br><br>
+    </li>
+    <li>
+        <a href="{% url 'CustomerProductsView' %}" style="text-decoration: None; color: #280101;"><b>Customer Products</b></a><br><br>
     </li>
 </ul>
-
 {% endblock body %}

@@ -1,0 +1,39 @@
+{% extends "blogs/base.html" %}
+
+{% block title %}
+    cart
+{% endblock title %}
+
+        
+{% block body %}
+
+<h1 align="center">Cart</h1>
+
+{% if cartitems %}
+    {% for item in cartitems %}
+    <ul>
+        <li style="border: 2px solid grey; padding: 20px; border-radius: 15px; text-align: justify; display: flex; justify-content: space-evenly; align-items: center; max-width: 975px;">
+            <a href="{% url 'remove_from_cart_action' item.product.pk %}" style="text-decoration: none; color: red;"><b>Remove</b></a>
+            <img src="{{ item.product.image.url }}" alt="" style="max-width: 100px; max-height: 100px;">
+            <p><b>{{ item.product.name }}</b></p>
+            <p><b>{{ item.product.brand.name }}</b> brand</p>
+            <p>Total: <b>{{ item.total_amount|floatformat:2 }}$</b></p>
+            <p>Quantity: {{ item.quantity}}</p>
+        </li>
+    </ul>
+    {% endfor %}
+    <div style="display: flex; justify-content: space-between;">
+        <a href="{% url 'confirmorder' %}" style="color: white; text-decoration: none; background-color: darkblue; border-radius: 10px; padding: 10px;"><b>Confirm all Order</b></a>
+        <p>Total: <b>{{ bill|floatformat:2 }}$</b></p>
+    </div>
+{% else %}
+    <p style="color: gray;">Your cart is Empty!</p>
+{% endif %}
+    
+
+
+<h3 align="center">
+    <a href="{% url 'home' %}" style="text-decoration: None;color: grey;"><b>Go Back</b></a>
+</h3>
+<hr>
+{% endblock body %}

@@ -1,0 +1,17 @@
+{% extends "blogs/base.html" %}
+
+{% block title %}
+    Interest Selection
+{% endblock title %}
+
+{% block body %}
+
+<h2 align="center">Tell us which categories you are interested in.</h2>
+
+<form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" style="color:green"><b>Save changes</b></button>
+</form>
+
+{% endblock body %}

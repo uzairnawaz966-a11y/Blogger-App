@@ -1,6 +1,5 @@
 from django.views.generic import ListView
-from django.shortcuts import render
-from django.db.models import Q
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from django.shortcuts import redirect
@@ -44,7 +43,7 @@ class FollowerBlogsView(LoginRequiredMixin, ListView):
         context["follower_blogs"] = blogs
 
         return context
-
+    
 
 class FollowingBlogsView(LoginRequiredMixin, ListView):
     model = Blog
@@ -70,15 +69,16 @@ def follow_button(request, username):
     following_user = Follow.objects.filter(follower=request.user.pk, following=feed_user.pk)
 
     user = User.objects.get(username=username)
-    global follow_variable
 
     if username != request.user.username:
         if not following_user:
             Follow.objects.create(follower=request.user, following=user)
+            messages.success(request, message=f"{user} Followed")
             return redirect(reverse('feed_list'))
         else:
             follow_object = Follow.objects.get(follower=request.user.pk, following=user.pk)
             follow_object.delete()
+            messages.success(request, message=f"{user} Unfollowed")
             return redirect(reverse('feed_list'))
 
     return redirect(reverse('feed_list'))

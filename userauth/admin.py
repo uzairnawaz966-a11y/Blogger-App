@@ -1,4 +1,5 @@
 from django.contrib import admin
+from userauth.models import Interest
 
 # Register your models here.
 
@@ -6,7 +7,12 @@ from django.contrib import admin
 
 
 
-
+@admin.register(Interest)
+class InterestAdmin(admin.ModelAdmin):
+    list_display = [
+        "id",
+        "user",
+    ]
 
 
 # username: admin

@@ -1,11 +1,9 @@
 from django import forms
-from blogs.models import Category
 from django.contrib.auth.models import User
-
+from userauth.models import Interest
 
 class SignupForm(forms.ModelForm):
     confirmation_password = forms.CharField(max_length=16)
-    category = forms.ModelMultipleChoiceField(queryset=Category.objects.all(), label="Choose your favourite categories")
 
     class Meta:
         model = User
@@ -29,3 +27,9 @@ class SignupForm(forms.ModelForm):
             if password != confirmation_password:
                 raise forms.ValidationError("Passwords does not match. Please make sure that the password and confirmation password match")
         return cleaned_data
+
+
+class InterestForm(forms.ModelForm):
+    class Meta:
+        model = Interest
+        fields = ['category']

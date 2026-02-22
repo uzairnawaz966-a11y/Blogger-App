@@ -1,38 +1,33 @@
 {% extends "blogs/base.html" %}
 
+
 {% block title %}
-    Feed
+    Blogs
 {% endblock title %}
 
 {% block body %}
 
-<h2 align="center">Blogs</h2>
+<h2 align="center">My Products</h2>
 
-{% if feed_blogs or following_list %}
-    {% for feed in feed_blogs %}
-    <ul>
+{% if my_products %}
+    {% for product in my_products %}
+    <ul style="max-width: 1000px;">
         <li style="border: 2px solid grey; padding: 20px; border-radius: 15px; text-align: justify;">
-            {% if not feed.user == request.user %}
-                {% if feed.user.pk in following_list %}
-                    <a href="{% url 'follow_button' feed.user.username %}" style="text-decoration: none;color: red;"><b>Unfollow {{ feed.user.username }}</b></a>
-                {% else %}
-                    <a href="{% url 'follow_button' feed.user.username %}" style="text-decoration: none;color: green;"><b>Follow {{ feed.user.username }}</b></a>
-                {% endif %}
-            {% endif %}
-            <p><b>User: </b>{{ feed.user.username }}</p>
-            <p><b>Title: </b>{{ feed.title }}</p>
-            <p><b>Description: </b>{{ feed.description }}</p>
-            <p><b>Category: </b>{{ feed.category }}</p>
-            <p><b>{{ feed.user }} is Interested in </b>{% for interest in feed.user.user_interests.all %}{{ interest }}{% if not forloop.last %}, {% endif %}{% endfor %}</p></br>
-            <p><b>Published at: </b>{{ feed.published_at }}</p>
+            <p><b>Name: </b>{{ product.name }}</p>
+            <p><b>Brand: </b>{{ product.brand }}</p>
+            <p><b>Description: </b>{{ product.description }}</p>
+            <p><b>Stock: </b>{{ product.stock }}</p>
+            <img src="{{ product.image.url }}" alt="" style="max-width: 300px;">
+            <p><b>Price: </b><strike style="color: silver;">{{ product.price }}$</strike> {{ product.discounted_price|floatformat:0 }}$</p>
+            <p align="center" style="color: green;"><b>{{ product.discount|floatformat:0 }}%OFF</b></p>
+            <a href="{% url 'UpdateProduct' product.slug %}">Update</a>
             <br>
             <br>
         </li>
     </ul>
     {% endfor %}
-
 {% else %}
-    <p style="color: gray;">No Blogs Found!</p>
+    <p style="color: gray;">You haven't added any product!</p>
 {% endif %}
 
 
@@ -49,6 +44,7 @@
 <div style="display: flex; justify-content: left;">
     <a href="?page={{ page_obj.previous_page_number }}" style="text-decoration: None;"><b>Previous Page</b></a>
 </div>
+
 {% endif %}
 
 {% if page_obj.paginator.num_pages != 1 %}

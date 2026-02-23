@@ -13,7 +13,7 @@
     {% for user in followings %}
         <ul>
             <li style="color: red;">
-                <b><a href="{% url 'following_blogs' user.following %}" style="text-decoration: None; color: darkblue;">{{ user.following }}</a></b> ( Interested in {{ user.following.interest.category }} category )<br><br>
+                <b><a href="{% url 'following_blogs' user.following %}" style="text-decoration: None; color: darkblue;">{{ user.following }}</a></b><br>
             </li>
         </ul>
     {% endfor %}

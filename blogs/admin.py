@@ -2,7 +2,6 @@ from django.contrib import admin
 from blogs.models import (
     Blog,
     Category,
-    Interest,
 )
 
 
@@ -17,15 +16,6 @@ class CategoryAdmin(admin.ModelAdmin):
     prepopulated_fields = {
     "slug": ("name", )
     }
-
-
-@admin.register(Interest)
-class InterestAdmin(admin.ModelAdmin):
-    list_display = [
-        "id",
-        "user",
-        "category"
-    ]
 
 
 @admin.register(Blog)

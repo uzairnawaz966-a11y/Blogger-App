@@ -1,0 +1,18 @@
+{% extends "blogs/base.html" %}
+
+{% block title %}
+    add product
+{% endblock title %}
+
+{% block body %}
+
+<h2 align="center">Update</h2>
+
+<form method="POST" enctype='multipart/form-data'>
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">save changes</button>
+    <a href="{% url 'home' %}"  style="text-decoration: None;color: red;"><b>Discard</b></a>
+</form>
+
+{% endblock body %}

@@ -1,0 +1,49 @@
+{% extends "blogs/base.html" %}
+
+
+
+{% block title %}
+    orders
+{% endblock title %}
+
+
+        
+{% block body %}
+
+
+
+<h2 align="center">My Orders</h2>
+
+
+
+{% if myorders %}
+    {% for order in myorders %}
+    <ul>
+        <li style="border: 2px solid grey; padding: 20px; border-radius: 15px; text-align: center;display: flex; justify-content: space-evenly;">
+            <img src="{{ order.item.image.url }}" alt="" style="max-width: 70px; max-height:70px">
+            <p>{{ order.item }}</p>
+            <p><b>price: </b>{{ order.total_price|floatformat:0 }}$</p>
+            <p><b>Quantity: </b>{{ order.quantity }}</p>
+            <p><b>Status: </b>{{ order.order.status }}</p>
+        </li>
+    </ul>
+        {% if forloop.last %}
+            {% if order.order.status == "PENDING" %}
+                <a href="{% url 'AddAddress' %}" style="color: darkblue; text-decoration: None;"><b>CHECKOUT</b></a>
+            {% endif %}
+        {% endif %}
+
+    {% endfor %}
+
+{% else %}
+    <p style="color: gray;">No Orders</p>
+{% endif %}
+
+
+
+<h3 align="center">
+    <a href="{% url 'MyOrders' %}" style="text-decoration: None;color: grey;"><b>Go Back</b></a>
+</h3>
+<hr>
+
+{% endblock body %}

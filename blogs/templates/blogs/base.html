@@ -11,12 +11,24 @@
 </head>
 <body>
     {% if request.user.is_authenticated %}
-
         <form method="POST" action="{% url 'logout' %}">
             {% csrf_token %}
             <button type="submit">Logout</button>
         </form>
-
+        {% for message in messages %}
+            {% if message.tags == 'info' %}
+                <p align="center" style="color: yellow, text-sh"><b>{{message}}</b></p>
+            {% endif %}
+                {% if message.tags == 'warning' %}
+                <p align="center" style="color: orange"><b>{{message}}</b></p>
+            {% endif %}
+                {% if message.tags == 'error' %}
+                <p align="center" style="color: red"><b>{{message}}</b></p>
+            {% endif %}
+                {% if message.tags == 'success' %}
+                <p align="center" style="color: green"><b>{{message}}</b></p>
+            {% endif %}
+        {% endfor %}
     {% endif %}
 
     {% block body %}

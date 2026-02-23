@@ -1,0 +1,36 @@
+{% extends "blogs/base.html" %}
+
+{% block title %}
+    orders
+{% endblock title %}
+
+{% block body %}
+
+<h2 align="center">My Orders</h2>
+
+{% if orders %}
+    {% for order in orders %}
+    <ul>
+        <li style="border: 2px solid grey; padding: 20px; border-radius: 15px; text-align: center;display: flex; justify-content: space-evenly; align-items:center">
+            <p><b>price: </b>{{ order.bill }}$</p>
+            <p><b>Status: </b>{{ order.status }}</p>
+            <a href="{% url 'OrderItemsView' %}" style="text-decoration:none; color: blue"><b>View Order</b></a>
+        </li>
+    </ul>
+{% endfor %}
+
+{% else %}
+    <p style="color: gray;">No Orders</p>
+{% endif %}
+
+
+<a href="{% url 'AddAddress' %}" style="color: darkblue; text-decoration: None;"><b>CHECKOUT</b></a>
+
+
+
+<h3 align="center">
+    <a href="{% url 'home' %}" style="text-decoration: None;color: grey;"><b>Go Back</b></a>
+</h3>
+<hr>
+
+{% endblock body %}

@@ -1,0 +1,36 @@
+from django.urls import path
+from products.views import (
+    AddProductView,
+    UpdateProduct,
+    MyProductsView,
+    TimelineView,
+    CartView,
+    add_to_cart_action,
+    remove_from_cart_action,
+    confirm_order,
+    OrderItemsView,
+    MyOrders,
+    CustomerProductsView,
+    AddAddress,
+    ChooseAddressView,
+    save_choosen_address,
+    PaymentView
+)
+
+urlpatterns = [
+    path('add/', AddProductView.as_view(), name='addproductview'),
+    path('update/<slug:slug>/', UpdateProduct.as_view(), name='UpdateProduct'),
+    path('products/', MyProductsView.as_view(), name="MyProductsView"),
+    path('timeline/', TimelineView.as_view(), name='TimelineView'),
+    path('cart/', CartView.as_view(), name="CartView"),
+    path('cart/<int:pk>/', add_to_cart_action, name="add_to_cart_action"),
+    path('remove/<int:pk>/', remove_from_cart_action, name="remove_from_cart_action"),
+    path('confirm/', confirm_order, name="confirmorder"),
+    path('orders/detail/', OrderItemsView.as_view(), name="OrderItemsView"),
+    path('orders/', MyOrders.as_view(), name="MyOrders"),
+    path('purchased/products/', CustomerProductsView.as_view(), name="CustomerProductsView"),
+    path('add/address/', AddAddress.as_view(), name="AddAddress"),
+    path('choose-address/', ChooseAddressView.as_view(), name="ChooseAddressView"),
+    path('address/<int:order_id>/', save_choosen_address, name="save-choosen-address"),
+    path('payment/', PaymentView.as_view(), name="PaymentView")
+]

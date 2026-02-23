@@ -1,0 +1,43 @@
+{% extends "blogs/base.html" %}
+
+{% block title %}
+    orders
+{% endblock title %}
+
+{% block body %}
+
+<h2 align="center">My Orders</h2>
+
+{% if orders %}
+    {% for order in orders %}
+    <ul>
+        <li style="border: 2px solid grey; padding: 20px; border-radius: 15px; text-align: center;display: flex; justify-content: space-evenly;">
+            <div>
+                <img src="{{ order.item.image.url }}" alt="" style="max-width: 70px; max-height:70px">
+                <p>{{ order.item }}</p>
+                <p><b>Customer: </b>{{ order.order.owner }}</p>
+                <p><b>price: </b>{{ order.total_price|floatformat:0 }}$</p>
+                <p><b>Quantity: </b>{{ order.quantity }}</p>
+                <p><b>Status: </b>{{ order.order.status }}</p>
+            </div>
+            <div>
+                <h2>Delivery to</h2>
+                <p><b>Country: </b>{{ order.order.address.country }}</p>
+                <p><b>Status: </b>{{ order.order.address.province }}</p>
+                <p><b>Status: </b>{{ order.order.address.street_address }}</p>
+                
+            </div>
+        </li>
+    </ul>
+{% endfor %}
+
+{% else %}
+    <p style="color: gray;">No Orders</p>
+{% endif %}
+
+<h3 align="center">
+    <a href="{% url 'home' %}" style="text-decoration: None;color: grey;"><b>Go Back</b></a>
+</h3>
+<hr>
+
+{% endblock body %}

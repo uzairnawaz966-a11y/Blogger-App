@@ -1,0 +1,50 @@
+{% extends "blogs/base.html" %}
+
+
+
+{% block title %}
+    Choose Address
+{% endblock title %}
+
+
+        
+{% block body %}
+
+
+
+<h2 align="center">Select Your Address</h2>
+
+
+
+{% if addresses %}
+    {% for address in addresses %}
+    <ul>
+        <li>
+            <div style="border: 2px solid grey; padding: 20px; border-radius: 15px; text-align: center;display: flex; justify-content: space-evenly;">
+
+                <p>Country: {{ address.country }}</p>
+                <p><b>province: </b>{{ address.province }}$</p>
+                <p><b>street_address: </b>{{ address.street_address }}</p>
+                <p><b>postal_code: </b>{{ address.postal_code }}</p>
+                <form action="{% url 'save-choosen-address' address.pk %}" method="POST">
+                    {% csrf_token %}
+                    <button type="submit" style="color: red;"><b>Choose</b></button>
+                </form>
+            </div>
+        </li>
+    </ul>
+
+    {% endfor %}
+
+{% else %}
+    <p style="color: gray;">You haven't added any address</p>
+{% endif %}
+
+
+
+<h3 align="center">
+    <a href="{% url 'MyOrders' %}" style="text-decoration: None;color: grey;"><b>Go Back</b></a>
+</h3>
+<hr>
+
+{% endblock body %}

@@ -1,0 +1,69 @@
+{% extends "blogs/base.html" %}
+
+{% block title %}
+    timeline
+{% endblock title %}
+
+{% block body %}
+
+<h2 align="center">Timeline</h2>
+
+{% if following_user_products %}
+    {% for product in following_user_products %}
+    {% if product.stock > 0 %}
+    <ul>
+        <li style="border: 2px solid grey; padding: 20px; border-radius: 15px; text-align: center;display: flex; justify-content: space-evenly;">
+            <div>
+                <p><b>Seller: </b>{{ product.product_seller }}</p>
+                <p><b>Name: </b>{{ product.name }}</p>
+                <p><b>price: </b>{{ product.discounted_price|floatformat:0 }}$</p>
+                {% if product.availability == "out of stock" %}
+                    <p style="color: green;">{{ product.availability }}</p>
+                {% endif %}
+                <p><b>Launched at </b>{{ product.published_at }}</p>
+                <p align='center'><b>{{ product.discount }}%OFF</b></p>
+            </div>
+            <div>
+                <img src="{{ product.image.url }}" alt="" style="max-width: 300px;">
+                <p style="font-size:13px; color: green;">{{ product.stock }} Items in stock</p>
+            </div>
+            <form action="{% url 'add_to_cart_action' product.pk %}" method="POST">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit">Add to Cart</button>
+            </form>
+        </li>
+    </ul>
+    {% endif %}
+    {% endfor %}
+
+{% else %}
+    <p style="color: gray;">No Products Found!</p>
+{% endif %}
+
+
+{% if page_obj.has_next and page_obj.has_previous %}
+<div style="display: flex; justify-content: space-between;">
+<a href="?page={{ page_obj.previous_page_number }}" style="text-decoration: None;"><b>Previous Page</b></a>
+<a href="?page={{ page_obj.next_page_number }}" style="text-decoration: None;"><b>Next Page</b></a>
+</div>
+{% elif page_obj.has_next %}
+<div style="display: flex; justify-content: right;">
+    <a href="?page={{ page_obj.next_page_number }}" style="text-decoration: None;"><b>Next Page</b></a>
+</div>
+{% elif page_obj.has_previous %}
+<div style="display: flex; justify-content: left;">
+    <a href="?page={{ page_obj.previous_page_number }}" style="text-decoration: None;"><b>Previous Page</b></a>
+</div>
+{% endif %}
+
+{% if page_obj.paginator.num_pages != 1 %}
+    <p align="center" style="color:grey">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</p>
+{% endif %}
+
+<h3 align="center">
+    <a href="{% url 'home' %}" style="text-decoration: None;color: grey;"><b>Go Back</b></a>
+</h3>
+<hr>
+
+{% endblock body %}

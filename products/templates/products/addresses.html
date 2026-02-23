@@ -1,0 +1,29 @@
+{% extends "blogs/base.html" %}
+
+{% block title %}
+    add address
+{% endblock title %}
+
+
+
+
+{% block body %}
+
+<h1 align="center">Add your Delivery Address to proceed further</h1>
+<br>
+<br>
+<br>
+<form align="center" method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Submit</button>
+</form>
+
+<a href="{% url 'ChooseAddressView' %}" style="text-decoration: None;color: white; background-color: green; padding: 7px; border-radius: 10px;"><b>Choose Address</b></a>
+
+<h3 align="center">
+    <a href="{% url 'MyOrders' %}" style="text-decoration: None;color: red;"><b>Cancel</b></a>
+</h3>
+
+
+{% endblock body %}

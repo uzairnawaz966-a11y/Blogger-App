@@ -24,14 +24,6 @@ def default_category():
     return category
 
 
-class Interest(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_interests")
-    category = models.ForeignKey(Category, on_delete=models.SET_DEFAULT, default=default_category)
-
-    def __str__(self):
-        return self.category.name
-
-
 class Blog(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="blogs")
     category = models.ForeignKey(Category, on_delete=models.SET_DEFAULT, default=default_category, related_name="blogs")

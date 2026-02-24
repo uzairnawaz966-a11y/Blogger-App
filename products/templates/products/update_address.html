@@ -1,15 +1,12 @@
 {% extends "blogs/base.html" %}
 
 {% block title %}
-    add address
+    Update address
 {% endblock title %}
-
-
-
 
 {% block body %}
 
-<h1 align="center">Add your Delivery Address to proceed further</h1>
+<h1 align="center">Update your Delivery Address</h1>
 <br>
 <br>
 <br>
@@ -18,8 +15,6 @@
     {{ form.as_p }}
     <button type="submit" >Submit</button>
 </form>
-
-<a href="{% url 'ChooseAddressView' %}" style="text-decoration: None;color: white; background-color: green; padding: 7px; border-radius: 10px;"><b>Choose Address</b></a>
 
 <h3 align="center">
     <a href="{% url 'MyOrders' %}" style="text-decoration: None;color: red;"><b>Cancel</b></a>

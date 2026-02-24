@@ -1,9 +1,12 @@
-from django.shortcuts import redirect
+import stripe
+from django.conf import settings
+from django.shortcuts import redirect, render
 from django.contrib import messages
 from django.db.models import F
 from products.models import Product, Cart, Order, OrderItem, Address
 from follow.models import Follow
 from django.contrib.auth.decorators import login_required
+from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy, reverse
 from products.forms import ProductForm, QuantityForm, AddressForm
@@ -136,7 +139,7 @@ class MyOrders(LoginRequiredMixin, ListView):
         return Order.objects.filter(owner=self.request.user)
 
 
-class CustomerProductsView(ListView):
+class CustomerProductsView(LoginRequiredMixin, ListView):
     model = Order
     template_name = "products/customer_products.html"
     context_object_name = "orders"
@@ -175,11 +178,11 @@ def confirm_order(request):
     return redirect("MyOrders")
 
 
-class AddAddress(CreateView):
+class AddAddress(LoginRequiredMixin, CreateView):
     model = Address
     form_class = AddressForm
     template_name = "products/addresses.html"
-    success_url = reverse_lazy("home")
+    success_url = reverse_lazy("PaymentView")
 
     def form_valid(self, form):
         delivery_address = form.save(commit=False)
@@ -190,6 +193,19 @@ class AddAddress(CreateView):
         return super().form_valid(form)
 
 
+class UpdateAddressView(LoginRequiredMixin, UpdateView):
+    model = Address
+    form_class = AddressForm
+    template_name = "products/update_address.html"
+    success_url =  reverse_lazy("MyOrders")
+
+    def form_valid(self, form):
+        updated_address = form.save(commit=False)
+        updated_address.user = self.request.user
+        updated_address.save()
+        messages.success(self.request, message="Address Changes")
+        return super().form_valid(form)
+
 @login_required
 def save_choosen_address(request, order_id):
     Order.objects.filter(owner=request.user, status="PENDING").update(address=order_id)
@@ -197,7 +213,7 @@ def save_choosen_address(request, order_id):
     return redirect(reverse("PaymentView"))
 
 
-class ChooseAddressView(ListView):
+class ChooseAddressView(LoginRequiredMixin, ListView):
     model = Address
     template_name = "products/choose_address.html"
     context_object_name = "addresses"
@@ -207,6 +223,53 @@ class ChooseAddressView(ListView):
         queryset = Address.objects.filter(user=user)
         return queryset
 
-
 class PaymentView(TemplateView):
     template_name = "products/payment.html"
+
+
+def payment_success(request):
+    Order.objects.filter(owner=request.user, status="PENDING").update(status="CONFIRMED")
+    messages.success(request, message="Order Confirmed successfully!")
+    return redirect(reverse("MyOrders"))
+
+def payment_cancel(request):
+    messages.error(request, message="Confirmation Cancelled")
+    return redirect(reverse("MyOrders"))
+
+
+stripe.api_key=settings.STRIPE_SECRET_KEY
+
+@login_required
+def create_checkout_session(request):
+    order = Order.objects.get(owner=request.user, status="PENDING")
+    order_items = OrderItem.objects.filter(order=order)
+
+    line_items = []
+    for item in order_items:
+        line_items.append(
+            {
+                'price_data':{
+                'currency': 'usd',
+                'product_data': {
+                    'name': item.item.name,
+                    'description': item.item.description,
+                    'images': [request.build_absolute_uri(item.item.image.url)],
+                },
+                'unit_amount': int(item.item.discounted_price * 100)
+            },
+            'quantity': item.quantity
+            }
+        )
+    session = stripe.checkout.Session.create(
+        payment_method_types=['card'],
+        line_items=line_items,
+        mode='payment',
+        success_url = request.build_absolute_uri(reverse("payment_success")),
+        cancel_url = request.build_absolute_uri(reverse("payment_cancel")),
+    )
+
+    customer = stripe.Customer.create(
+        name = order.owner,
+        email= "exampleemail@exampleemail.com",
+    )
+    return redirect(session.url)

@@ -15,6 +15,11 @@
             <p><b>price: </b>{{ order.bill }}$</p>
             <p><b>Status: </b>{{ order.status }}</p>
             <a href="{% url 'OrderItemsView' %}" style="text-decoration:none; color: blue"><b>View Order</b></a>
+            {% if order.status == "PENDING" %}
+                <a href="{% url 'AddAddress' %}" style="color: darkblue; text-decoration: None;"><b>CHECKOUT</b></a>
+            {% elif order.status == "CONFIRMED" %}
+                <a href="{% url 'UpdateAddressView' order.address.id %}" style="color: green; text-decoration: None;"><b>Change Address</b></a>
+            {% endif %}
         </li>
     </ul>
 {% endfor %}
@@ -22,11 +27,6 @@
 {% else %}
     <p style="color: gray;">No Orders</p>
 {% endif %}
-
-
-<a href="{% url 'AddAddress' %}" style="color: darkblue; text-decoration: None;"><b>CHECKOUT</b></a>
-
-
 
 <h3 align="center">
     <a href="{% url 'home' %}" style="text-decoration: None;color: grey;"><b>Go Back</b></a>

@@ -92,6 +92,7 @@ class OrderItemAdmin(admin.ModelAdmin):
 @admin.register(Address)
 class AddressAdmin(admin.ModelAdmin):
     list_display = [
+        'id',
         'user',
         'full_name',
         'phone',

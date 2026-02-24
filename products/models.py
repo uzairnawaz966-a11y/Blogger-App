@@ -108,7 +108,7 @@ class Address(models.Model):
         verbose_name_plural = "Addresses"
 
     def __str__(self):
-        return f"{self.full_name}'s address"
+        return self.street_address
 
 
 class Order(models.Model):

@@ -14,7 +14,11 @@ from products.views import (
     AddAddress,
     ChooseAddressView,
     save_choosen_address,
-    PaymentView
+    PaymentView,
+    create_checkout_session,
+    payment_success,
+    payment_cancel,
+    UpdateAddressView
 )
 
 urlpatterns = [
@@ -32,5 +36,9 @@ urlpatterns = [
     path('add/address/', AddAddress.as_view(), name="AddAddress"),
     path('choose-address/', ChooseAddressView.as_view(), name="ChooseAddressView"),
     path('address/<int:order_id>/', save_choosen_address, name="save-choosen-address"),
-    path('payment/', PaymentView.as_view(), name="PaymentView")
+    path('payment/', PaymentView.as_view(), name="PaymentView"),
+    path("create-checkout/", create_checkout_session, name="create_checkout"),
+    path("success/", payment_success, name="payment_success"),
+    path("cancel/", payment_cancel, name="payment_cancel"),
+    path("update-address/<int:pk>/", UpdateAddressView.as_view(), name="UpdateAddressView"),
 ]

@@ -1,16 +1,19 @@
 import stripe
+import json
+from django.http import JsonResponse
 from django.conf import settings
 from django.shortcuts import redirect, render
 from django.contrib import messages
+from userauth.models import StripeCustomer
 from django.db.models import F
-from products.models import Product, Cart, Order, OrderItem, Address
+from products.models import Product, Cart, Order, OrderItem, Address, StripeOrderObject
 from follow.models import Follow
+from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
-from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy, reverse
 from products.forms import ProductForm, QuantityForm, AddressForm
-from django.views.generic import CreateView, ListView, UpdateView, TemplateView
+from django.views.generic import CreateView, ListView, UpdateView
 
 
 class AddProductView(LoginRequiredMixin, CreateView):
@@ -118,8 +121,6 @@ def remove_from_cart_action(request, pk):
     return redirect(reverse("CartView"))
 
 
-
-
 class OrderItemsView(LoginRequiredMixin, ListView):
     model = OrderItem
     template_name = "products/order_items.html"
@@ -136,7 +137,7 @@ class MyOrders(LoginRequiredMixin, ListView):
     context_object_name = "orders"
 
     def get_queryset(self):
-        return Order.objects.filter(owner=self.request.user)
+        return Order.objects.filter(owner=self.request.user).order_by("-created_at")
 
 
 class CustomerProductsView(LoginRequiredMixin, ListView):
@@ -182,7 +183,7 @@ class AddAddress(LoginRequiredMixin, CreateView):
     model = Address
     form_class = AddressForm
     template_name = "products/addresses.html"
-    success_url = reverse_lazy("PaymentView")
+    success_url = reverse_lazy("payment_page")
 
     def form_valid(self, form):
         delivery_address = form.save(commit=False)
@@ -210,7 +211,7 @@ class UpdateAddressView(LoginRequiredMixin, UpdateView):
 def save_choosen_address(request, order_id):
     Order.objects.filter(owner=request.user, status="PENDING").update(address=order_id)
     messages.success(request, message="Address Added")
-    return redirect(reverse("PaymentView"))
+    return redirect(reverse("payment_page"))
 
 
 class ChooseAddressView(LoginRequiredMixin, ListView):
@@ -223,53 +224,110 @@ class ChooseAddressView(LoginRequiredMixin, ListView):
         queryset = Address.objects.filter(user=user)
         return queryset
 
-class PaymentView(TemplateView):
-    template_name = "products/payment.html"
-
-
-def payment_success(request):
-    Order.objects.filter(owner=request.user, status="PENDING").update(status="CONFIRMED")
-    messages.success(request, message="Order Confirmed successfully!")
-    return redirect(reverse("MyOrders"))
-
-def payment_cancel(request):
-    messages.error(request, message="Confirmation Cancelled")
-    return redirect(reverse("MyOrders"))
-
 
 stripe.api_key=settings.STRIPE_SECRET_KEY
 
 @login_required
-def create_checkout_session(request):
-    order = Order.objects.get(owner=request.user, status="PENDING")
-    order_items = OrderItem.objects.filter(order=order)
+def payment_page(request):
+    stripe_publishable_key = settings.STRIPE_PUBLISHABLE_KEY
+    try:
+        order = Order.objects.get(owner=request.user, status="PENDING")
+    except Exception as e:
+        print(e)
+        messages.error(request, message="You haven't any unpaid orders")
+        return redirect(reverse("MyOrders"))
+    context = {
+        "stripe_publishable_key": stripe_publishable_key,
+        "amount": order.bill,
+        "currency": 'USD',
+        "email": request.user.email,
+        "order_items": order.OrderItems.all(),
+        "order":     order
+    }
+    return render(request, "products/payment.html", context)
 
-    line_items = []
-    for item in order_items:
-        line_items.append(
-            {
-                'price_data':{
-                'currency': 'usd',
-                'product_data': {
-                    'name': item.item.name,
-                    'description': item.item.description,
-                    'images': [request.build_absolute_uri(item.item.image.url)],
-                },
-                'unit_amount': int(item.item.discounted_price * 100)
-            },
-            'quantity': item.quantity
-            }
-        )
-    session = stripe.checkout.Session.create(
-        payment_method_types=['card'],
-        line_items=line_items,
-        mode='payment',
-        success_url = request.build_absolute_uri(reverse("payment_success")),
-        cancel_url = request.build_absolute_uri(reverse("payment_cancel")),
-    )
 
-    customer = stripe.Customer.create(
-        name = order.owner,
-        email= "exampleemail@exampleemail.com",
-    )
-    return redirect(session.url)
+@csrf_exempt
+def create_payment_intent(request, order_id):
+    existing_paid_order = Order.objects.get(pk=order_id)
+    if not existing_paid_order.is_paid:
+        if request.method == "POST":
+            data = json.loads(request.body)
+            customer_name = request.user.username
+            customer_amount = data.get("amount")
+            customer_currency = data.get("currency")
+            customer_email = data.get("email")
+
+            try:
+                stripe_customer = StripeCustomer.objects.get(user=request.user)
+
+            except StripeCustomer.DoesNotExist:
+                delivery_order = Order.objects.get(id=order_id, owner=request.user.id)
+                customer = stripe.Customer.create(
+                    name=customer_name,
+                    email=customer_email,
+                    address={"country":delivery_order.address.country}
+                    )
+                stripe_customer = StripeCustomer.objects.create(user=request.user, stripe_customer_id=customer.id)
+
+            except Exception as e:
+                messages.error(request, message=e)
+
+            intent = stripe.PaymentIntent.create(
+                amount=int(customer_amount) * 100,
+                currency=customer_currency,
+                customer=stripe_customer.stripe_customer_id,
+                payment_method_types=["card"]
+            )
+            paid_order = Order.objects.get(id=order_id, owner=request.user.id)
+            StripeOrderObject.objects.create(order=paid_order, payment_intent_id=intent.id)
+            paid_order.status = "CONFIRMED"
+            paid_order.is_paid = True
+            paid_order.save()
+            return JsonResponse({"client_secret": intent.client_secret})
+    else:
+        messages.error(request, message="Order already paid")
+        return JsonResponse({"message": "Already Paid!"})
+
+
+@csrf_exempt
+def refund_payment(request, order_id):
+    if request.method == "POST":
+        try:
+            order = Order.objects.get(id=order_id, owner=request.user, status="CONFIRMED")
+            stripe_order_object = StripeOrderObject.objects.get(order__id=order_id, order__owner=request.user, order__status="CONFIRMED")
+        except Order.DoesNotExist:
+            messages.error(request, message="Order not Found")
+            return redirect(reverse("MyOrders"))
+        except StripeOrderObject.DoesNotExist:
+            messages.error(request, message="Please make sure that your order is paid")
+            return redirect(reverse("MyOrders"))
+        except Exception as e:
+            messages.error(request, message="Refund failed due to some errors")
+            return redirect(reverse("MyOrders"))
+        
+        if order.is_paid == False:
+            messages.error(request, message="Order is not paid")
+            return redirect(reverse("MyOrders"))
+        
+        if stripe_order_object.is_refunded:
+            messages.error(request, message="Order already refunded")
+            return redirect(reverse("MyOrders"))
+        else:
+            refund = stripe.Refund.create(
+                payment_intent=stripe_order_object.payment_intent_id
+            )
+            stripe_order_object.is_refunded = True
+            stripe_order_object.save()
+            messages.success(request, message="Order Refunded Successfully")
+            return redirect(reverse("MyOrders"))
+
+
+def success(request):
+    messages.success(request, message="Your payment is successfully submitted")
+    return redirect(reverse("MyOrders"))
+
+
+def failed(request):
+    messages.error(request, message="Payment Failed due to some issues")
+    return redirect(reverse("MyOrders"))

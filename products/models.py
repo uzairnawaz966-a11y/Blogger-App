@@ -1,5 +1,4 @@
 from django.db import models
-from blogs.models import Category
 from django.template.defaultfilters import slugify
 from django.contrib.auth.models import User
 
@@ -12,6 +11,9 @@ class ProductCategory(models.Model):
         verbose_name_plural = "Product Categories"
 
     def save(self, *args, **kwargs):
+        """
+        Creates a slug for every saving product category so that it will be used in urls
+        """
         if not self.slug:
             self.slug = slugify(self.name)
         return super().save(*args, **kwargs)
@@ -21,6 +23,9 @@ class ProductCategory(models.Model):
 
 
 def get_default_product_category():
+    """
+    Fetches a default category named 'uncategorized' if exists otherwise creates and return that category
+    """
     product_category, created = ProductCategory.objects.get_or_create(name="uncategorized")
     return product_category.pk
 
@@ -31,6 +36,9 @@ class Brand(models.Model):
     slug = models.SlugField()
 
     def save(self, *args, **kwargs):
+        """
+        Creates a slug of saving brand based on the brand name
+        """
         if not self.slug:
             self.slug = slugify(self.name)
         return super().save(*args, **kwargs)
@@ -40,6 +48,10 @@ class Brand(models.Model):
 
 
 def get_default_product_brand():
+    """
+    Fetches the default brand named 'No Brand' for products if the parent brand gets deleted
+    if the brand named 'No Brand' does not exists, it will create it and return it.
+    """
     product_brand, created = Brand.objects.get_or_create(name="No Brand")
     return product_brand.pk
 
@@ -64,6 +76,12 @@ class Product(models.Model):
 
     @property
     def discounted_price(self):
+        """
+        Calculates the discounted price of the product according to the discount.
+
+        - If the discount is greater than 0, it will calculates the discounted price and returns is
+        - If the discount is 0 then it will simply return the original price because 0 discount doesn't effects the original price
+        """
         if self.discount and self.discount > 0:
             return self.price - (self.price * self.discount // 100)
         return self.price
@@ -85,6 +103,9 @@ class Cart(models.Model):
 
     @property
     def total_amount(self):
+        """
+        This fnuction accepts the unit price and the quantity of the order item and calculates the total amount of the order item.
+        """
         total = self.product.discounted_price * self.quantity
         return total
     
@@ -108,7 +129,7 @@ class Address(models.Model):
         verbose_name_plural = "Addresses"
 
     def __str__(self):
-        return f"{self.full_name}'s address"
+        return self.street_address
 
 
 class Order(models.Model):
@@ -121,13 +142,14 @@ class Order(models.Model):
     )
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="Order")
     address = models.ForeignKey(Address, on_delete=models.SET_NULL, related_name="addresses", null=True, blank=True)
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES,default='PENDING')
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='PENDING')
     bill = models.PositiveIntegerField(default=0)
+    is_paid = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now=True)
 
 
     def __str__(self):
-        return self.owner.username
+        return f"{self.owner.username} ( {self.status} ) {self.pk}"
 
 
 class OrderItem(models.Model):
@@ -141,3 +163,12 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return self.item.name
+
+class StripeOrderObject(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.PROTECT, related_name="StripeOrderObject")
+    payment_intent_id = models.CharField(max_length=255)
+    is_refunded = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.payment_intent_id

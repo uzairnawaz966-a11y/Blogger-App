@@ -1,3 +1,4 @@
+from django.views.generic import TemplateView
 from django.urls import path
 from products.views import (
     AddProductView,
@@ -14,7 +15,12 @@ from products.views import (
     AddAddress,
     ChooseAddressView,
     save_choosen_address,
-    PaymentView
+    payment_page,
+    UpdateAddressView,
+    create_payment_intent,
+    refund_payment,
+    success,
+    failed,
 )
 
 urlpatterns = [
@@ -32,5 +38,10 @@ urlpatterns = [
     path('add/address/', AddAddress.as_view(), name="AddAddress"),
     path('choose-address/', ChooseAddressView.as_view(), name="ChooseAddressView"),
     path('address/<int:order_id>/', save_choosen_address, name="save-choosen-address"),
-    path('payment/', PaymentView.as_view(), name="PaymentView")
+    path('payment-page/', payment_page, name="payment_page"),
+    path("update-address/<int:pk>/", UpdateAddressView.as_view(), name="UpdateAddressView"),
+    path("create-payment-intent/<int:order_id>", create_payment_intent, name="create_payment_intent"),
+    path("refund-payment/<int:order_id>", refund_payment, name="refund_payment"),
+    path("payment-successful/", success, name="success"),
+    path("payment-failed/", failed, name="failed")
 ]

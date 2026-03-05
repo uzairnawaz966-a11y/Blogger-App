@@ -1,5 +1,5 @@
 from django.contrib import admin
-from userauth.models import Interest
+from userauth.models import Interest, StripeCustomer
 
 # Register your models here.
 
@@ -12,6 +12,15 @@ class InterestAdmin(admin.ModelAdmin):
     list_display = [
         "id",
         "user",
+    ]
+
+
+@admin.register(StripeCustomer)
+class StripeCustomerAdmin(admin.ModelAdmin):
+    list_display = [
+        "id",
+        "user__username",
+        'stripe_customer_id',
     ]
 
 

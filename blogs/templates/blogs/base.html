@@ -8,6 +8,9 @@
         
         {% endblock title %}
     </title>
+    {% block head %}
+
+    {% endblock head %}
 </head>
 <body>
     {% if request.user.is_authenticated %}

@@ -6,7 +6,8 @@ from products.models import (
     Cart,
     Order,
     OrderItem,
-    Address
+    Address,
+    StripeOrderObject
 )
 
 
@@ -73,6 +74,7 @@ class OrderAdmin(admin.ModelAdmin):
         'owner',
         'status',
         'bill',
+        "is_paid",
         'address',
         'created_at',
     ]
@@ -92,6 +94,7 @@ class OrderItemAdmin(admin.ModelAdmin):
 @admin.register(Address)
 class AddressAdmin(admin.ModelAdmin):
     list_display = [
+        'id',
         'user',
         'full_name',
         'phone',
@@ -99,4 +102,14 @@ class AddressAdmin(admin.ModelAdmin):
         'province',
         'street_address',
         'postal_code',
+    ]
+
+@admin.register(StripeOrderObject)
+class StripeOrderObjectAdmin(admin.ModelAdmin):
+    list_display = [
+        "id",
+        "order",
+        "payment_intent_id",
+        "is_refunded",
+        "created_at",
     ]

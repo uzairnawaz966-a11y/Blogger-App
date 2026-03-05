@@ -34,3 +34,6 @@ class AddressForm(forms.ModelForm):
             "street_address",
             "postal_code",
         ]
+        labels = {
+            "postal_code": "Postal Code",
+        }

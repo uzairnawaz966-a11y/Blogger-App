@@ -1,10 +1,79 @@
 {% extends "blogs/base.html" %}
 
 {% block title %}
-    payment
+    payment page
 {% endblock title %}
+
+{% block head %}
+    <script src="https://js.stripe.com/v3/"></script>
+{% endblock head %}
 
 
 {% block body %}
-    <h1>Hi, Payment page</h1>
+<h1 align="center">Pay your amount to place order</h1>
+
+<h3>Total: {{ order.bill }}$</h3>
+<center>
+    <form id="payment-form" style="width:500px;" align="center">
+        <div id="card-element"></div>
+        <br>
+        <button type="submit">Pay</button>
+    </form>
+</center>
+
+<ul>
+    {% for order_item in order_items %}
+    <li style="border: 2px solid grey; padding: 20px; border-radius: 25px; margin-bottom: 15px;">
+            <p><b>Name: </b>{{ order_item.item.name }}</p>
+            <img src="{{ order_item.item.image.url }}" alt="" style="max-width: 75px; max-height: 75px;">
+            <p><b>description: </b>{{ order_item.item.description }}</p>
+            <p><b>Unit price: </b>{{ order_item.item.discounted_price }}$</p>
+            <p><b>Quantity: </b>{{ order_item.quantity }}</p>
+            <p><b>Total: </b>{{ order_item.total_price }}$</p>
+    </li>
+    {% endfor %}
+</ul>
+
+<h3 align="center">
+    <a href="{% url 'home' %}" style="text-decoration: None; color: red;"><b>Cancel</b></a>
+</h3>
+<hr>
+
+<script>
+const stripe = Stripe('{{ stripe_publishable_key }}');
+const elements = stripe.elements();
+const card = elements.create('card');
+card.mount('#card-element');
+
+const form = document.getElementById('payment-form');
+form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const data = {
+        amount: {{ amount }},
+        currency: "{{ currency }}",
+        email: "{{ email }}",
+    };
+
+    const response = await fetch("{% url 'create_payment_intent' order.id %}", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+    });
+
+    const result = await response.json();
+
+    const {error} = await stripe.confirmCardPayment(
+        result.client_secret,
+        { payment_method: { card: card } }
+    );
+
+    if (error) {
+        window.location.href = "{% url 'failed' %}"
+    } else {
+        window.location.href = "{% url 'success' %}"
+    }
+});
+</script>
+
 {% endblock body %}
